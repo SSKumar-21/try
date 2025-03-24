@@ -58,7 +58,7 @@ document.getElementById("signupForm").addEventListener("submit", (e) => {
     })
     .then(() => {
         alert("Account created successfully!");
-        window.location.href = "./landing.html";  // Redirect to landing page
+        window.location.href = "./index.html";  // Redirect to landing page
     })
     .catch((error) => {
         alert("Error: " + error.message);
