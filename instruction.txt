@@ -1,0 +1,241 @@
+1.
+
+when firebase api will be expired:
+
+    QUESTION:
+i am making a sign up page using firebase
+1. check the password is 8character long, contain capital letter,small letter, number, and specail character.
+2. password and rePassword should be same
+3. checkbox should be checked
+4. on clicking on submit button if any of the conditoin not satisfy give the alert.
+5. connect the firebase database and store the username, email, and password of user when it click on sumbit button.
+6. when data is store alert (" account created sucessfully"), if not alert(errorMessage");
+7. if data is store then redirect the page to )./landing.html"
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGN UP</title>
+    <link rel="stylesheet" href="./assest/style/animation.css">
+    <link rel="stylesheet" href="./assest/style/signup.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="main">
+        <div class="upper ">
+            <p class="ani">
+                <b>. . .</b><br>
+                Let's<br>
+                <b>
+                    Create<br>
+                    Your<br>
+                    Account<br>
+                </b>
+            </p>
+        </div>
+        <div class="lower">
+        <form>
+            <div class="input-container ani">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" placeholder="Full Name" id="name">
+            </div>
+        
+            <div class="input-container ani">
+                <i class="fa-regular fa-envelope"></i>
+                <input type="email" placeholder="Email" id="email">
+            </div>
+        
+            <div class="input-container ani">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" placeholder="Password" id="password">
+            </div>
+        
+            <div class="input-container ani">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" placeholder="Retype Password" id="rePassword">
+            </div>
+        
+            <span class="CB ani">
+                <input type="checkbox" value="agree" id="checkbox"> I agree to the Terms and Conditions
+            </span>
+        
+            <button class="ani" id="submit">Sign Up</button>
+        </form>
+        
+            
+        <div class="bottom ani">
+            <span >Have an Account?</span>
+            <a href="./login.html"> <span>Sign In</span></a>
+        </div>
+        </div>
+    </div>
+    <script src="./assest/script/deviceCheck.js"></script>
+    <script type="module" src="./assest/script/signup.js"></script>
+</body>
+</html>
+
+
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBOJRXpVmq-6CQvmDA2VRfgXrEeCig-utA",
+    authDomain: "her-975f3.firebaseapp.com",
+    projectId: "her-975f3",
+    storageBucket: "her-975f3.firebasestorage.app",
+    messagingSenderId: "941568685726",
+    appId: "1:941568685726:web:71c6b346c5e34dba356d8f"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
+
+and also give the step i need to change in firebse if require
+
+ANSWER:
+
+Here’s how you can complete your sign-up page with Firebase authentication and database storage.
+
+---
+
+### **Steps to Configure Firebase**
+1. **Enable Firebase Authentication**
+   - Go to the [Firebase Console](https://console.firebase.google.com/).
+   - Select your project (`her-975f3`).
+   - Navigate to **Authentication** → **Sign-in method**.
+   - Enable **Email/Password** authentication.
+
+2. **Set Up Firebase Firestore Database**
+   - In Firebase Console, go to **Firestore Database**.
+   - Click **Create Database** → Select **Start in Test Mode** (for development).
+   - Click **Next** and choose your region.
+   - Click **Enable**.
+
+3. **Update Firebase Rules (Optional)**
+   - In Firestore, go to **Rules** and ensure they allow writing for authenticated users:
+   ```json
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /users/{userId} {
+         allow read, write: if request.auth != null;
+       }
+     }
+   }
+   ```
+
+---
+
+### **Updated `signup.js` (Validation + Firebase Integration)**
+Create or update your `signup.js` file:
+
+```javascript
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js";
+
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyBOJRXpVmq-6CQvmDA2VRfgXrEeCig-utA",
+    authDomain: "her-975f3.firebaseapp.com",
+    projectId: "her-975f3",
+    storageBucket: "her-975f3.firebasestorage.app",
+    messagingSenderId: "941568685726",
+    appId: "1:941568685726:web:71c6b346c5e34dba356d8f"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Function to validate password
+function isValidPassword(password) {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
+}
+
+// Event listener for sign-up
+document.getElementById("submit").addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const rePassword = document.getElementById("rePassword").value;
+    const checkbox = document.getElementById("checkbox").checked;
+
+    // Form Validation
+    if (!name) {
+        alert("Please enter your full name.");
+        return;
+    }
+    if (!email) {
+        alert("Please enter your email.");
+        return;
+    }
+    if (!isValidPassword(password)) {
+        alert("Password must be at least 8 characters long and include a capital letter, small letter, number, and special character.");
+        return;
+    }
+    if (password !== rePassword) {
+        alert("Passwords do not match.");
+        return;
+    }
+    if (!checkbox) {
+        alert("You must agree to the Terms and Conditions.");
+        return;
+    }
+
+    // Register user with Firebase Authentication
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Store user data in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+            name: name,
+            email: email,
+            password: password // Storing plain password is NOT recommended; use hashing instead
+        });
+
+        alert("Account created successfully!");
+        window.location.href = "./landing.html";
+    } catch (error) {
+        alert(error.message);
+    }
+});
+```
+
+---
+
+### **Changes You Need to Make**
+1. **Enable Firebase Authentication (Email/Password)**
+2. **Enable Firestore Database**
+3. **Update Firebase Rules (Optional)**
+4. **Add `signup.js` to Your Project**
+5. **Ensure Firebase SDK URLs Are Correct**
+6. **Test Your Sign-Up Process**
+
+---
+
+Now, your sign-up form will:
+✔ Validate the password format  
+✔ Ensure passwords match  
+✔ Check if the checkbox is checked  
+✔ Store the user in Firebase Authentication and Firestore  
+✔ Redirect to `landing.html` after successful sign-up
+
+
+2. 
+
+Using SMPTJS for sending mail for password recovery
+
