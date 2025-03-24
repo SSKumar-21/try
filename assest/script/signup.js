@@ -31,9 +31,10 @@ document.getElementById("signupForm").addEventListener("submit", (e) => {
     // Password validation
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(password)) {
-        alert("Password must be at least 8 characters long, contain a capital letter, a small letter, a number, and a special character.");
-        return;
-    }
+    alert("Password must be at least 8 characters long, contain a capital letter, a small letter, a number, and a special character.");
+    return;
+}
+
 
     // Check if passwords match
     if (password !== rePassword) {
