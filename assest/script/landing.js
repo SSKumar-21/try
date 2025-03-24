@@ -1,59 +1,48 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
 import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
-// Firebase configuration
+// Firebase Configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyB5xMzpAbzgvL6uNAv5uZluPqLR5iuLdSY",
-    authDomain: "her-6d883.firebaseapp.com",
+    apiKey: "AIzaSyBOJRXpVmq-6CQvmDA2VRfgXrEeCig-utA",
+    authDomain: "her-975f3.firebaseapp.com",
     databaseURL: "https://her-6d883-default-rtdb.firebaseio.com",
-    projectId: "her-6d883",
-    storageBucket: "her-6d883.firebasestorage.app",
-    messagingSenderId: "660185862853",
-    appId: "1:660185862853:web:9852b01191f0931dd016ac"
+    projectId: "her-975f3",
+    storageBucket: "her-975f3.firebasestorage.app",
+    messagingSenderId: "941568685726",
+    appId: "1:941568685726:web:71c6b346c5e34dba356d8f"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+const db = getDatabase(app);
 
-document.addEventListener("DOMContentLoaded", async () => {
-    const userNameElement = document.getElementById("userName");
-    if (!userNameElement) return;
+// Fetch logged-in user email from session storage
+const loggedInEmail = sessionStorage.getItem("loggedInEmail");
 
-    let email = sessionStorage.getItem("loggedInEmail");
-    
-    if (!email) {
-        window.location.href = "./login.html"; // Redirect if not logged in
-        return;
-    }
+if (loggedInEmail) {
+    const dbRef = ref(db, "users");
 
-    const dbRef = ref(database, "users");
-
-    try {
-        const snapshot = await get(child(dbRef, "/"));
+    get(dbRef).then((snapshot) => {
         if (snapshot.exists()) {
             let users = snapshot.val();
             let foundUser = null;
 
+            // Loop through users to find matching email
             Object.values(users).forEach(user => {
-                if (user.email === email) {
-                    foundUser = username;
+                if (user.email === loggedInEmail) {
+                    foundUser = user;
                 }
             });
 
-            console.log("Found User:", foundUser);
-
-            if (foundUser && foundUser.name) {
-                userNameElement.innerText = `Welcome, ${foundUser.name}!`;
+            if (foundUser) {
+                document.getElementById("userName").innerText = ` ${foundUser.username}!`;
             } else {
-                userNameElement.innerText = "Welcome, User!";
+                document.getElementById("userName").innerText = "Hello, User!";
             }
-        } else {
-            console.log("No users found in database.");
-            userNameElement.innerText = "Welcome, User!";
         }
-    } catch (error) {
-        console.error("Error fetching user data:", error);
-        userNameElement.innerText = "Error loading user data!";
-    }
-});
+    }).catch((error) => {
+        console.error("Error fetching user:", error);
+    });
+} else {
+    window.location.href = "./login.html"; // Redirect if not logged in
+}
