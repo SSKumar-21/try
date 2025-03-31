@@ -35,7 +35,7 @@ if (loggedInEmail) {
             });
 
             if (foundUser) {
-                document.getElementById("userName").innerText = ` ${foundUser.username}!`;
+                document.getElementById("userName").innerText = `Hello  ${foundUser.username}!`;
             } else {
                 document.getElementById("userName").innerText = "Hello, User!";
             }
